@@ -1,21 +1,24 @@
 package services;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import event.ListEvent;
 import model.Epic;
 import model.ItemStatus;
 import model.Subtask;
 import repository.Repo;
 
-public class SubtaskManager extends Manager implements Repo<Subtask> {
+public class SubtaskManager extends Manager implements Repo<Subtask>, PropertyChangeListener {
 
-    EpicManager epicManager;
-    private Map<Integer, Subtask> subtasks = new HashMap<>();
+    private final EpicManager epicManager;
+    private final Map<Integer, Subtask> subtasks = new HashMap<>();
 
     public SubtaskManager(EpicManager epicManager) {
         this.epicManager = epicManager;
+        epicManager.addPropertyChangeListener(this);
     }
 
     @Override
@@ -30,8 +33,10 @@ public class SubtaskManager extends Manager implements Repo<Subtask> {
 
     @Override
     public void update(Subtask subtask) {
-        subtasks.put(subtask.getId(), subtask);
-        updateEpicStatus(subtask.getEpicId());
+        if (subtasks.containsKey(subtask.getId())) {
+            subtasks.put(subtask.getId(), subtask);
+            updateEpicStatus(subtask.getEpicId());
+        }
     }
 
     @Override
@@ -40,8 +45,9 @@ public class SubtaskManager extends Manager implements Repo<Subtask> {
     }
 
     @Override
-    public Map<Integer, Subtask> getAll() {
-        return subtasks;
+    public List<Subtask> getAll() {
+        return new ArrayList<>(subtasks.values());
+
     }
 
     @Override
@@ -58,6 +64,7 @@ public class SubtaskManager extends Manager implements Repo<Subtask> {
     @Override
     public void delete(int id) {
         Subtask subtask = subtasks.get(id);
+
         if (subtask != null) {
             epicManager.removeSubtask(subtask);
             updateEpicStatus(subtask.getEpicId());
@@ -69,25 +76,53 @@ public class SubtaskManager extends Manager implements Repo<Subtask> {
         Epic epic = epicManager.getById(epicId);
         if (null != epic) {
             List<Integer> subtaskIds = epic.getSubtaskIds();
-            int size = subtaskIds.size();
-            if (size == 0) {
+            if (subtaskIds.size() == 0 || isTheSameStatus(subtaskIds, ItemStatus.NEW)) {
                 epic.setStatus(ItemStatus.NEW);
+            } else if (isTheSameStatus(subtaskIds, ItemStatus.DONE)) {
+                epic.setStatus(ItemStatus.DONE);
             } else {
-                ItemStatus status = ItemStatus.DONE;
-                for (Integer subTaskId : subtaskIds) {
-                    Subtask subtask = subtasks.get(subTaskId);
-                    if (subtask.getStatus() != ItemStatus.DONE) {
-                        status = ItemStatus.IN_PROGRESS;
-                        break;
-                    }
-                }
-                epic.setStatus(status);
+                epic.setStatus(ItemStatus.IN_PROGRESS);
             }
         }
     }
 
+    private boolean isTheSameStatus(List<Integer> subtaskIds, ItemStatus checkStatus) {
+        boolean isTheSame = false;
+        for (Integer subTaskId : subtaskIds) {
+            Subtask subtask = subtasks.get(subTaskId);
+            if (subtask.getStatus() == checkStatus) {
+                isTheSame = true;
+            } else {
+                isTheSame = false;
+                break;
+            }
+        }
+        return isTheSame;
+    }
+
     public void print() {
         subtasks.forEach((key, subtask) -> System.out.println(subtask));
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        String propertyName = evt.getPropertyName();
+        if (propertyName.equals(ListEvent.DELETED_EPIC)) {
+            int epicId = (int) evt.getNewValue();
+            System.out.println("Оповещение для свойства: " + propertyName + " удалили epic c id = " + epicId);
+            Set<Integer> ids = findByEpicId(epicId);
+            if (null != ids) {
+                ids.forEach(id -> subtasks.remove(id));
+            }
+        }
+    }
+
+    private Set<Integer> findByEpicId(int iEpicId) {
+        return subtasks.values().stream()
+                .filter(subtask -> subtask.getEpicId() == iEpicId)
+                .map(Subtask::getId)
+                .collect(Collectors.toSet());
+
     }
 
 }

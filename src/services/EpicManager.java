@@ -1,27 +1,50 @@
 package services;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.util.*;
 
+import event.ListEvent;
 import model.Epic;
 import model.Subtask;
 import repository.Repo;
 
 public class EpicManager extends Manager implements Repo<Epic> {
 
-    private Map<Integer, Epic> epics = new HashMap<>();
+    private final Map<Integer, Epic> epics = new HashMap<>();
+    private final PropertyChangeSupport support;
+
+    public EpicManager() {
+        support = new PropertyChangeSupport(this);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        support.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        support.removePropertyChangeListener(listener);
+    }
 
     public void addSubtask(Subtask subtask) {
         Epic epic = epics.get(subtask.getEpicId());
-        List<Integer> subTasks = epic.getSubtaskIds();
-        subTasks.add(subtask.getId());
+        if (null != epic) {
+            epic.addSubtask(subtask.getId());
+        }
     }
 
     public void removeSubtask(Subtask subtask) {
         Epic epic = epics.get(subtask.getEpicId());
-        List<Integer> subTasks = epic.getSubtaskIds();
-        subTasks.remove(subTasks.indexOf(subtask.getId()));
+        if (null != epic) {
+            epic.removeSubtask(subtask.getId());
+        }
+    }
+
+    public void removeAllSubtasks(int epicId) {
+        Epic epic = epics.get(epicId);
+        if (null != epic) {
+            epic.removeAllSubtasks();
+        }
     }
 
     @Override
@@ -33,7 +56,10 @@ public class EpicManager extends Manager implements Repo<Epic> {
 
     @Override
     public void update(Epic epic) {
-        epics.put(epic.getId(), epic);
+        int epicId = epic.getId();
+        if (epics.containsKey(epicId)) {
+            epics.put(epicId, epic);
+        }
     }
 
     @Override
@@ -42,22 +68,28 @@ public class EpicManager extends Manager implements Repo<Epic> {
     }
 
     @Override
-    public Map<Integer, Epic> getAll() {
-        return epics;
+    public List<Epic> getAll() {
+        return new ArrayList<>(epics.values());
     }
 
     @Override
     public void clear() {
-        epics.clear();
-    }
-
-    @Override
-    public void delete(int id) {
-        epics.remove(id);
+        Iterator<Map.Entry<Integer, Epic>> iter = epics.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry<Integer, Epic> entry = iter.next();
+            support.firePropertyChange(ListEvent.DELETED_EPIC, 0, entry.getValue().getId());
+            iter.remove();
+        }
     }
 
     public void print() {
         epics.forEach((key, epic) -> System.out.println(epic));
+    }
+
+    @Override
+    public void delete(int id) {
+        support.firePropertyChange(ListEvent.DELETED_EPIC, 0, id);
+        epics.remove(id);
     }
 
 }

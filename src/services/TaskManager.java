@@ -1,14 +1,15 @@
 package services;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import model.Task;
 import repository.Repo;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class TaskManager extends Manager implements Repo<Task> {
 
-    private Map<Integer, Task> tasks = new HashMap<>();
+    private final Map<Integer, Task> tasks = new HashMap<>();
 
     @Override
     public Task create(Task task) {
@@ -19,7 +20,9 @@ public class TaskManager extends Manager implements Repo<Task> {
 
     @Override
     public void update(Task task) {
-        tasks.put(task.getId(), task);
+        if (tasks.containsKey(task.getId())) {
+            tasks.put(task.getId(), task);
+        }
     }
 
     @Override
@@ -28,8 +31,8 @@ public class TaskManager extends Manager implements Repo<Task> {
     }
 
     @Override
-    public Map<Integer, Task> getAll() {
-        return tasks;
+    public List<Task> getAll() {
+        return new ArrayList<>(tasks.values());
     }
 
     @Override

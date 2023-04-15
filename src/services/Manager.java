@@ -1,11 +1,9 @@
 package services;
 
-public class Manager implements HasId{
-
+public class Manager {
     int nextId = 1;
 
-    @Override
-    public int getNextId() {
+    protected int getNextId() {
         return nextId++;
     }
 }
