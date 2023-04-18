@@ -1,6 +1,8 @@
 package model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class Epic extends Task {
 
@@ -18,7 +20,7 @@ public class Epic extends Task {
         subtaskIds.add(id);
     }
 
-    public void removeSubtask(Integer id) {
+    public void removeSubtask(int id) {
         subtaskIds.remove(id);
     }
 
