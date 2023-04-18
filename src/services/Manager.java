@@ -100,7 +100,6 @@ public class Manager {
             for (int id : epic.getSubtaskIds()) {
                 subtasks.remove(id);
             }
-            updateEpicStatus(epicId);
         }
     }
 
@@ -129,11 +128,23 @@ public class Manager {
     }
 
     public List<Subtask> getAllSubtasksByEpicId(int epicId) {
+/*
         return subtasks
                 .values()
                 .stream()
                 .filter(subtask -> subtask.getEpicId() == epicId)
                 .collect(Collectors.toList());
+ */
+
+        ArrayList<Subtask> tasks = new ArrayList<>();
+        Epic epic = epics.get(epicId);
+        if (epic == null) {
+            return null;
+        }
+        for (int id : epic.getSubtaskIds()) {
+            tasks.add(subtasks.get(id));
+        }
+        return tasks;
     }
 
     public void clearSubtasks() {
