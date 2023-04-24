@@ -22,38 +22,46 @@ public class InMemoryTaskManager implements TaskManager{
         return nextId++;
     }
 
+    @Override
     public Task createTask(Task task) {
         task.setId(getNextId());
         tasks.put(task.getId(), task);
         return task;
     }
 
+    @Override
     public void updateTask(Task task) {
         if (tasks.containsKey(task.getId())) {
             tasks.put(task.getId(), task);
         }
     }
 
+    @Override
     public Task getTaskById(int id) {
         return tasks.get(id);
     }
 
+    @Override
     public List<Task> getAllTasks() {
         return new ArrayList<>(tasks.values());
     }
 
+    @Override
     public void clearTasks() {
         tasks.clear();
     }
 
+    @Override
     public void removeTask(int id) {
         tasks.remove(id);
     }
 
+    @Override
     public void printTasks() {
         tasks.forEach((key, task) -> System.out.println(task));
     }
 
+    @Override
     public void removeAllSubtasks() {
         subtasks.clear();
         for (Epic epic : epics.values()) {
@@ -62,12 +70,14 @@ public class InMemoryTaskManager implements TaskManager{
         }
     }
 
+    @Override
     public Epic createEpic(Epic epic) {
         epic.setId(getNextId());
         epics.put(epic.getId(), epic);
         return epic;
     }
 
+    @Override
     public void updateEpic(Epic epic) {
         Epic originalEpic = epics.get(epic.getId());
         if (originalEpic != null) {
@@ -76,23 +86,28 @@ public class InMemoryTaskManager implements TaskManager{
         }
     }
 
+    @Override
     public Epic getEpicById(int id) {
         return epics.get(id);
     }
 
+    @Override
     public List<Epic> getAllEpics() {
         return new ArrayList<>(epics.values());
     }
 
+    @Override
     public void clearEpics() {
         epics.clear();
         subtasks.clear();
     }
 
+    @Override
     public void printEpics() {
         epics.forEach((key, epic) -> System.out.println(epic));
     }
 
+    @Override
     public void removeEpic(int epicId) {
         Epic epic = epics.remove(epicId);
         if (epic != null) {
@@ -102,6 +117,7 @@ public class InMemoryTaskManager implements TaskManager{
         }
     }
 
+    @Override
     public Subtask createSubtask(Subtask subtask) {
         subtask.setId(getNextId());
         subtasks.put(subtask.getId(), subtask);
@@ -115,6 +131,7 @@ public class InMemoryTaskManager implements TaskManager{
         return subtask;
     }
 
+    @Override
     public void updateSubtask(Subtask subtask) {
         if (subtasks.containsKey(subtask.getId())) {
             subtasks.put(subtask.getId(), subtask);
@@ -122,10 +139,12 @@ public class InMemoryTaskManager implements TaskManager{
         }
     }
 
+    @Override
     public List<Subtask> getAllSubtasks() {
         return new ArrayList<>(subtasks.values());
     }
 
+    @Override
     public List<Subtask> getAllSubtasksByEpicId(int epicId) {
         ArrayList<Subtask> tasks = new ArrayList<>();
         Epic epic = epics.get(epicId);
@@ -138,6 +157,7 @@ public class InMemoryTaskManager implements TaskManager{
         return tasks;
     }
 
+    @Override
     public void clearSubtasks() {
         epics.forEach((key, epic) -> {
             epic.removeAllSubtasks();
@@ -146,6 +166,7 @@ public class InMemoryTaskManager implements TaskManager{
         subtasks.clear();
     }
 
+    @Override
     public void removeSubtask(int id) {
         Subtask subtask = subtasks.remove(id);
         if (null != subtask) {
@@ -155,6 +176,11 @@ public class InMemoryTaskManager implements TaskManager{
                 updateEpicStatus(epic.getId());
             }
         }
+    }
+
+    @Override
+    public void printSubtasks() {
+        subtasks.forEach((key, subtask) -> System.out.println(subtask));
     }
 
     private void updateEpicStatus(int epicId) {
@@ -195,10 +221,6 @@ public class InMemoryTaskManager implements TaskManager{
         }
 
         return defaultStatus;
-    }
-
-    public void printSubtasks() {
-        subtasks.forEach((key, subtask) -> System.out.println(subtask));
     }
 
 }
