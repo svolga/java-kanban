@@ -9,14 +9,16 @@ import model.Epic;
 import model.ItemStatus;
 import model.Subtask;
 import model.Task;
+import util.Managers;
 
-public class InMemoryTaskManager implements TaskManager{
+public class InMemoryTaskManager implements TaskManager {
 
     private int nextId = 1;
 
     private final Map<Integer, Epic> epics = new HashMap<>();
     private final Map<Integer, Subtask> subtasks = new HashMap<>();
     private final Map<Integer, Task> tasks = new HashMap<>();
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
 
     private int getNextId() {
         return nextId++;
@@ -37,8 +39,10 @@ public class InMemoryTaskManager implements TaskManager{
     }
 
     @Override
-    public Task getTaskById(int id) {
-        return tasks.get(id);
+    public Task getTask(int id) {
+        Task task = tasks.get(id);
+        historyManager.addTask(task);
+        return task;
     }
 
     @Override
@@ -87,8 +91,10 @@ public class InMemoryTaskManager implements TaskManager{
     }
 
     @Override
-    public Epic getEpicById(int id) {
-        return epics.get(id);
+    public Epic getEpic(int id) {
+        Epic epic = epics.get(id);
+        historyManager.addTask(epic);
+        return epic;
     }
 
     @Override
@@ -167,6 +173,13 @@ public class InMemoryTaskManager implements TaskManager{
     }
 
     @Override
+    public Subtask getSubtask(int id) {
+        Subtask subtask = subtasks.get(id);
+        historyManager.addTask(subtask);
+        return subtask;
+    }
+
+    @Override
     public void removeSubtask(int id) {
         Subtask subtask = subtasks.remove(id);
         if (null != subtask) {
@@ -183,8 +196,22 @@ public class InMemoryTaskManager implements TaskManager{
         subtasks.forEach((key, subtask) -> System.out.println(subtask));
     }
 
+    @Override
+    public void printHistory() {
+        List<Task> tasks = historyManager.getHistory();
+
+        System.out.println("*** Начало истории просмотров ***");
+
+        if (null != tasks) {
+            tasks.forEach(task -> {
+                System.out.println(task);
+            });
+        }
+        System.out.println("*** Завершение истории просмотров ***");
+    }
+
     private void updateEpicStatus(int epicId) {
-        Epic epic = getEpicById(epicId);
+        Epic epic = getEpic(epicId);
         if (null != epic) {
             epic.setStatus(calculateEpicStatus(epic));
         }
@@ -222,5 +249,6 @@ public class InMemoryTaskManager implements TaskManager{
 
         return defaultStatus;
     }
+
 
 }
