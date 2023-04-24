@@ -22,13 +22,7 @@ public class Epic extends Task {
     }
 
     public void removeSubtask(int id) {
-        Iterator<Integer> values = subtaskIds.iterator();
-        while (values.hasNext()) {
-            int value = values.next();
-            if (id == value) {
-                values.remove();
-            }
-        }
+        subtaskIds.remove((Integer) id);
     }
 
     public void removeAllSubtasks() {

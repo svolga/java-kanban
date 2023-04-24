@@ -97,17 +97,27 @@ public class Main {
 
     private void printTasks() {
         List<Task> list = taskManager.getAllTasks();
-        list.forEach(task -> System.out.println(task));
+
+        list.forEach(task -> {
+            taskManager.getTask(task.getId());
+            System.out.println(task);
+        });
     }
 
     private void printEpics() {
         List<Epic> list = taskManager.getAllEpics();
-        list.forEach(epic -> System.out.println(epic));
+        list.forEach(epic -> {
+            taskManager.getEpic(epic.getId());
+            System.out.println(epic);
+        });
     }
 
     private void printSubtasks() {
         List<Subtask> list = taskManager.getAllSubtasks();
-        list.forEach(subtask -> System.out.println(subtask));
+        list.forEach(subtask -> {
+            taskManager.getSubtask(subtask.getId());
+            System.out.println(subtask);
+        });
     }
 
     private void printHistory() {
