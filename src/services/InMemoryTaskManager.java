@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import model.Epic;
 import model.ItemStatus;
 import model.Subtask;
 import model.Task;
 
-public class Manager {
+public class InMemoryTaskManager implements TaskManager{
 
     private int nextId = 1;
 
@@ -128,14 +127,6 @@ public class Manager {
     }
 
     public List<Subtask> getAllSubtasksByEpicId(int epicId) {
-/*
-        return subtasks
-                .values()
-                .stream()
-                .filter(subtask -> subtask.getEpicId() == epicId)
-                .collect(Collectors.toList());
- */
-
         ArrayList<Subtask> tasks = new ArrayList<>();
         Epic epic = epics.get(epicId);
         if (epic == null) {
