@@ -42,7 +42,7 @@ public class Main {
         taskManager.removeTask (2);
         printHistory ();
 
-        System.out.println ("\nУдалили epic с тремя подзадачами");
+        System.out.println ("\nУдалили epic с тремя подзадачами --> 3");
         taskManager.removeEpic (3);
         printHistory ();
     }

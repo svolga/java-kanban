@@ -14,19 +14,18 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     class CustomLinkedList<T extends Task> {
 
-        Map<Integer, Node> map = new LinkedHashMap<> ();
+        private final Map<Integer, Node> map = new LinkedHashMap<> ();
         private Node<T> head;
         private Node<T> tail;
 
         public void linkLast(T t) {
-            final Node<T> oldTail = tail;
-            final Node<T> newNode = new Node<> (oldTail, t, null);
-            tail = newNode;
-            if (oldTail == null)
+            final Node<T> newNode = new Node<> (tail, t, null);
+            if (tail == null)
                 head = newNode;
             else
-                oldTail.next = newNode;
+                tail.next = newNode;
 
+            tail = newNode;
             map.put (t.getId (), newNode);
         }
 
@@ -34,7 +33,9 @@ public class InMemoryHistoryManager implements HistoryManager {
             return map.values ().stream ().map (node -> node.data).collect (Collectors.toList ());
         }
 
-        public void removeNode(Node node) {
+        public void removeNode(int id) {
+            Node node = map.remove (id);
+
             if (null == node)
                 return;
 
@@ -70,8 +71,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int id) {
-        Node node = tasks.map.get (id);
-        tasks.removeNode (node);
-        tasks.map.remove (id);
+        tasks.removeNode (id);
     }
 }
