@@ -13,7 +13,7 @@ import util.Managers;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private int nextId = 1;
+    private int nextId = 0;
 
     private final Map<Integer, Epic> epics = new HashMap<> ();
     private final Map<Integer, Subtask> subtasks = new HashMap<> ();
@@ -48,6 +48,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearTasks() {
+        tasks.keySet ().forEach (historyManager::remove);
         tasks.clear ();
     }
 
@@ -58,8 +59,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void removeAllSubtasks() {
-        subtasks.keySet ().forEach (id -> historyManager.remove (id));
+    public void clearSubtasks() {
+        subtasks.keySet ().forEach (historyManager::remove);
         subtasks.clear ();
 
         for (Epic epic : epics.values ()) {
@@ -98,7 +99,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearEpics() {
+        epics.keySet ().forEach (historyManager::remove);
         epics.clear ();
+        subtasks.keySet ().forEach (historyManager::remove);
         subtasks.clear ();
     }
 
@@ -153,14 +156,7 @@ public class InMemoryTaskManager implements TaskManager {
         return tasks;
     }
 
-    @Override
-    public void clearSubtasks() {
-        epics.forEach ((key, epic) -> {
-            epic.removeAllSubtasks ();
-            updateEpicStatus (epic.getId ());
-        });
-        subtasks.clear ();
-    }
+
 
     @Override
     public Subtask getSubtask(int id) {
@@ -188,7 +184,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private int getNextId() {
-        return nextId++;
+        return ++nextId;
     }
 
     private void updateEpicStatus(int epicId) {
