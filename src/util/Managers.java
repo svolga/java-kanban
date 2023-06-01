@@ -1,9 +1,6 @@
 package util;
 
-import services.HistoryManager;
-import services.InMemoryHistoryManager;
-import services.InMemoryTaskManager;
-import services.TaskManager;
+import services.*;
 
 public class Managers {
 
@@ -14,5 +11,10 @@ public class Managers {
     public static TaskManager getDefault() {
         return new InMemoryTaskManager();
     }
+
+    public static FileBackedTasksManager getDefaultFile(String filePath) {
+        return new FileBackedTasksManager (filePath);
+    }
+
 
 }

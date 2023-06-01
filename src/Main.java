@@ -1,20 +1,46 @@
 import model.Epic;
 import model.Subtask;
 import model.Task;
-import services.TaskManager;
+import services.FileBackedTasksManager;
 import util.Managers;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class Main {
 
-    private final TaskManager taskManager = Managers.getDefault ();
+    private final String FILE_PATH = "resources/tasks.csv";
+    private final FileBackedTasksManager taskManager = Managers.getDefaultFile (FILE_PATH);
 
     public static void main(String[] args) {
         new Main ().run ();
     }
 
     private void run() {
+        createDemo ();
+
+        try {
+            FileBackedTasksManager fileBackedTasksManager = FileBackedTasksManager.loadFromFile (Paths.get (FILE_PATH).toFile ());
+            List<Task> tasks = fileBackedTasksManager.getAllTasks ();
+            List<Epic> epics = fileBackedTasksManager.getAllEpics ();
+            List<Subtask> subtasks = fileBackedTasksManager.getAllSubtasks ();
+            List<Task> taskHistorys = fileBackedTasksManager.getHistory ();
+
+            System.out.println ("\n ************ После чтения из файла: ***********");
+            tasks.forEach (System.out::println);
+            epics.forEach (System.out::println);
+            subtasks.forEach (System.out::println);
+
+            System.out.println ("\n ############ После чтения Истории из файла: ############");
+            taskHistorys.forEach (System.out::println);
+
+        } catch (IOException e) {
+            e.printStackTrace ();
+        }
+    }
+
+    private void createDemo() {
         System.out.println ("\nЗадачи (tasks)");
         createDemoTasks ();
         printTasks ();
@@ -26,26 +52,11 @@ public class Main {
 
         System.out.println ("\nДобавили подзадачи (subtasks)");
         createDemoEpics ();
+
         printSubtasks ();
         printHistory ();
-
-        printEpics ();
-        System.out.println ("\nПросмотрели epic --> 3");
-        taskManager.getEpic (3);
-        printHistory ();
-
-        System.out.println ("\nПросмотрели задачу task --> 2");
-        taskManager.getTask (2);
-        printHistory ();
-
-        System.out.println ("\nУдалили задачу task --> 2");
-        taskManager.removeTask (2);
-        printHistory ();
-
-        System.out.println ("\nУдалили epic с тремя подзадачами --> 3");
-        taskManager.removeEpic (3);
-        printHistory ();
     }
+
 
     private void createDemoEpics() {
         Epic epic1 = taskManager.createEpic (new Epic (0, "Первый Epic", "Описание первого эпика"));
