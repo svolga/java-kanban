@@ -1,5 +1,8 @@
 package model;
 
+import model.enums.ItemStatus;
+import model.enums.ItemType;
+
 import java.util.Objects;
 
 public class Subtask extends Task {
@@ -45,4 +48,9 @@ public class Subtask extends Task {
                 ", epicId=" + epicId +
                 '}';
     }
+
+    public ItemType getType() {
+        return ItemType.SUBTASK;
+    }
+
 }

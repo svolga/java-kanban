@@ -2,6 +2,7 @@ import model.Epic;
 import model.Subtask;
 import model.Task;
 import services.FileBackedTasksManager;
+import services.TaskManager;
 import util.Managers;
 
 import java.io.IOException;
@@ -10,8 +11,8 @@ import java.util.List;
 
 public class Main {
 
-    private final String FILE_PATH = "resources/tasks.csv";
-    private final FileBackedTasksManager taskManager = Managers.getDefaultFile (FILE_PATH);
+    private final String FILE_PATH = "resources/task.csv";
+    private final TaskManager taskManager = Managers.getDefaultFile (FILE_PATH);
 
     public static void main(String[] args) {
         new Main ().run ();
@@ -25,7 +26,7 @@ public class Main {
             List<Task> tasks = fileBackedTasksManager.getAllTasks ();
             List<Epic> epics = fileBackedTasksManager.getAllEpics ();
             List<Subtask> subtasks = fileBackedTasksManager.getAllSubtasks ();
-            List<Task> taskHistorys = fileBackedTasksManager.getHistory ();
+            List<Task> taskHistories = fileBackedTasksManager.getHistory ();
 
             System.out.println ("\n ************ После чтения из файла: ***********");
             tasks.forEach (System.out::println);
@@ -33,7 +34,7 @@ public class Main {
             subtasks.forEach (System.out::println);
 
             System.out.println ("\n ############ После чтения Истории из файла: ############");
-            taskHistorys.forEach (System.out::println);
+            taskHistories.forEach (System.out::println);
 
         } catch (IOException e) {
             e.printStackTrace ();
@@ -56,8 +57,7 @@ public class Main {
         printSubtasks ();
         printHistory ();
     }
-
-
+    
     private void createDemoEpics() {
         Epic epic1 = taskManager.createEpic (new Epic (0, "Первый Epic", "Описание первого эпика"));
         taskManager.createSubtask (new Subtask (0, "Первая подзадача", "Описание первой подзадачи", epic1.getId ()));

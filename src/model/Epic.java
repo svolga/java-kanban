@@ -1,7 +1,9 @@
 package model;
 
+import model.enums.ItemStatus;
+import model.enums.ItemType;
+
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,6 +13,10 @@ public class Epic extends Task {
 
     public Epic(int id, String title, String description) {
         super(id, title, description);
+    }
+
+    public Epic(int id, String title, String description, ItemStatus itemStatus) {
+        super(id, title, description, itemStatus);
     }
 
     public List<Integer> getSubtaskIds() {
@@ -47,8 +53,13 @@ public class Epic extends Task {
     public String toString() {
         return "Epic{" +
                 super.toString() +
-                ", subtasks=" + String.valueOf(subtaskIds) +
+                ", subtasks=" + subtaskIds +
                 '}';
     }
+
+    public ItemType getType() {
+        return ItemType.EPIC;
+    }
+
 
 }

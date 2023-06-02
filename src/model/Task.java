@@ -1,10 +1,9 @@
 package model;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import model.enums.ItemStatus;
+import model.enums.ItemType;
+
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class Task {
 
@@ -64,21 +63,21 @@ public class Task {
         if (this == o) return true;
         if (!(o instanceof Task)) return false;
         Task task = (Task) o;
-        return getId () == task.getId () && Objects.equals (getTitle (), task.getTitle ()) && Objects.equals (getDescription (), task.getDescription ()) && getStatus () == task.getStatus ();
+        return getId() == task.getId() && Objects.equals(getTitle(), task.getTitle()) && Objects.equals(getDescription(), task.getDescription()) && getStatus() == task.getStatus();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash (getId (), getTitle (), getDescription (), getStatus ());
+        return Objects.hash(getId(), getTitle(), getDescription(), getStatus());
     }
 
     @Override
     public String toString() {
-        return String.format ("Task {id = %d, title = %s, description = %s, status = %s}", id, title, description, status);
+        return String.format("Task {id = %d, title = %s, description = %s, status = %s}", id, title, description, status);
     }
 
-    public ItemType getItemType() {
-        return ItemType.valueOf (this.getClass ().getSimpleName ().toUpperCase ());
+    public ItemType getType() {
+        return ItemType.TASK;
     }
 
 }
