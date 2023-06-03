@@ -48,9 +48,9 @@ public class Subtask extends Task {
                 ", epicId=" + epicId +
                 '}';
     }
-
+    
+    @Override
     public ItemType getType() {
         return ItemType.SUBTASK;
     }
-
 }

@@ -57,7 +57,7 @@ public class Main {
         printSubtasks ();
         printHistory ();
     }
-    
+
     private void createDemoEpics() {
         Epic epic1 = taskManager.createEpic (new Epic (0, "Первый Epic", "Описание первого эпика"));
         taskManager.createSubtask (new Subtask (0, "Первая подзадача", "Описание первой подзадачи", epic1.getId ()));

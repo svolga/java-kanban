@@ -57,9 +57,8 @@ public class Epic extends Task {
                 '}';
     }
 
+    @Override
     public ItemType getType() {
         return ItemType.EPIC;
     }
-
-
 }

@@ -172,7 +172,10 @@ public final class FileBackedTasksManager extends InMemoryTaskManager {
                     } else {
                         fileBackedTasksManager.tasks.put(task.getId(), task);
                     }
-                    fileBackedTasksManager.nextId = task.getId() + 1;
+
+                    if (task.getId() > fileBackedTasksManager.nextId){
+                        fileBackedTasksManager.nextId = task.getId();
+                    }
 
                 } else if (i == count - 1) {
                     List<Integer> historyTaskIds = historyFromString(line);
