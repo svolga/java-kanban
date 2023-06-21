@@ -2,8 +2,14 @@ package model;
 
 import model.enums.ItemStatus;
 import model.enums.ItemType;
+import util.Const;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class Task {
 
@@ -11,19 +17,27 @@ public class Task {
     private String title;
     private String description;
     private ItemStatus status;
+    private int duration;
+    private LocalDateTime startTime;
+    protected LocalDateTime endTime;
+    protected final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(Const.DATE_TIME_FORMAT);
 
-    public Task(int id, String title, String description) {
+    public Task(int id, String title, String description, LocalDateTime startTime, int duration) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = ItemStatus.NEW;
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
-    public Task(int id, String title, String description, ItemStatus status) {
+    public Task(int id, String title, String description, LocalDateTime startTime, int duration, ItemStatus status) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
     public int getId() {
@@ -58,26 +72,50 @@ public class Task {
         this.status = status;
     }
 
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Task)) return false;
         Task task = (Task) o;
-        return getId() == task.getId() && Objects.equals(getTitle(), task.getTitle()) && Objects.equals(getDescription(), task.getDescription()) && getStatus() == task.getStatus();
+        return getId() == task.getId() && getDuration() == task.getDuration() && getTitle().equals(task.getTitle()) && getDescription().equals(task.getDescription()) && getStatus() == task.getStatus() && getStartTime().equals(task.getStartTime());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getTitle(), getDescription(), getStatus());
+        return Objects.hash(getId(), getTitle(), getDescription(), getStatus(), getDuration(), getStartTime());
     }
 
     @Override
     public String toString() {
-        return String.format("Task {id = %d, title = %s, description = %s, status = %s}", id, title, description, status);
+        LocalDateTime endTime = this.getEndTime();
+        String strEndTime = endTime == null ? "" : endTime.format(dateTimeFormatter);
+        return String.format("Task {id = %d, title = %s, description = %s, status = %s; startTime = %s; duration = %d; endTime = %s}",
+                id, title, description, status, startTime == null ? "" : startTime.format(dateTimeFormatter), duration, strEndTime);
     }
 
     public ItemType getType() {
         return ItemType.TASK;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime != null ? startTime.plusMinutes(duration) : null;
     }
 
 }

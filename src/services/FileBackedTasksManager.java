@@ -17,6 +17,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,7 @@ public final class FileBackedTasksManager extends InMemoryTaskManager {
 
     private final String filePath;
     private final static String DELIMITER = ",";
-    private final static List<String> HEADERS = List.of("id", "type", "name", "status", "description", "epic");
+    private final static List<String> HEADERS = List.of("id", "type", "name", "status", "description", "startTime", "duration", "endTime", "epic");
 
     public FileBackedTasksManager(String filePath) {
         this.filePath = filePath;
@@ -126,19 +127,6 @@ public final class FileBackedTasksManager extends InMemoryTaskManager {
         save();
     }
 
-    public static String historyToString(HistoryManager manager) {
-        List<Task> list = manager.getHistory();
-        return list == null ? "" : list.stream().map(task -> String.valueOf(task.getId())).collect(Collectors.joining(DELIMITER));
-    }
-
-    public static List<Integer> historyFromString(String value) {
-        return Arrays.stream(value.split(DELIMITER))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .map(Integer::valueOf)
-                .collect(Collectors.toList());
-    }
-
     public static FileBackedTasksManager loadFromFile(File file) throws IOException {
         if (!file.exists()) {
             throw new FileNotFoundException("Файл не существует: " + file.getAbsolutePath());
@@ -173,7 +161,7 @@ public final class FileBackedTasksManager extends InMemoryTaskManager {
                         fileBackedTasksManager.tasks.put(task.getId(), task);
                     }
 
-                    if (task.getId() > fileBackedTasksManager.nextId){
+                    if (task.getId() > fileBackedTasksManager.nextId) {
                         fileBackedTasksManager.nextId = task.getId();
                     }
 
@@ -207,13 +195,33 @@ public final class FileBackedTasksManager extends InMemoryTaskManager {
         return fileBackedTasksManager;
     }
 
+    private static String historyToString(HistoryManager manager) {
+        List<Task> list = manager.getHistory();
+        return list == null ? "" : list.stream().map(task -> String.valueOf(task.getId())).collect(Collectors.joining(DELIMITER));
+    }
+
+    private static List<Integer> historyFromString(String value) {
+        return Arrays.stream(value.split(DELIMITER))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(Integer::valueOf)
+                .collect(Collectors.toList());
+    }
+
     private String toString(final Task task) {
+
+        LocalDateTime startTime = task.getStartTime();
+        LocalDateTime endTime = task.getEndTime();
+
         return String.join(DELIMITER,
                 String.valueOf(task.getId()),
                 String.valueOf(task.getType()),
                 task.getTitle(),
                 String.valueOf(task.getStatus()),
                 task.getDescription(),
+                startTime == null ? " " : startTime.format(dateTimeFormatter),
+                String.valueOf(task.getDuration()),
+                endTime == null ? " " : endTime.format(dateTimeFormatter),
                 task instanceof Subtask ? String.valueOf(((Subtask) task).getEpicId()) : ""
         );
     }
@@ -228,15 +236,19 @@ public final class FileBackedTasksManager extends InMemoryTaskManager {
             String name = fields[2];
             ItemStatus itemStatus = ItemStatus.valueOf(fields[3]);
             String description = fields[4];
-            int epicId = fields.length == HEADERS.size() ? Integer.parseInt(fields[5]) : 0;
+            String strStartTime = fields[5].trim();
+            LocalDateTime startTime = strStartTime.isEmpty() ? null : LocalDateTime.parse(strStartTime, dateTimeFormatter);
+            int duration = Integer.parseInt(fields[6]);
+
+            int epicId = fields.length == HEADERS.size() ? Integer.parseInt(fields[8]) : 0;
 
             switch (itemType) {
                 case TASK:
-                    return new Task(id, name, description, itemStatus);
+                    return new Task(id, name, description, startTime, duration, itemStatus);
                 case EPIC:
                     return new Epic(id, name, description, itemStatus);
                 case SUBTASK:
-                    return new Subtask(id, name, description, itemStatus, epicId);
+                    return new Subtask(id, name, description, startTime, duration, itemStatus, epicId);
             }
         }
         return null;
