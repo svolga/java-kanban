@@ -60,12 +60,12 @@ public class FileBackedTasksManagerTest extends TaskManagerTest{
     }
 
     private void createDemoEpics() {
-        Epic epic1 = taskManager.createEpic (new Epic (0, "Первый Epic", "Описание первого эпика"));
+        Epic epic1 = taskManager.createEpic (new Epic (0, "Первый Epic", "Описание первого эпика", null, 10));
         taskManager.createSubtask (new Subtask (0, "Первая подзадача", "Описание первой подзадачи", LocalDateTime.parse("20.06.2023 14:01:00", dateTimeFormatter), 10,  epic1.getId ()));
         taskManager.createSubtask (new Subtask (0, "Вторая подзадача", "Описание второй подзадачи", LocalDateTime.parse("20.06.2023 14:19:00", dateTimeFormatter), 10, epic1.getId ()));
         taskManager.createSubtask (new Subtask (0, "Третья подзадача", "Описание третьей подзадачи", LocalDateTime.parse("20.06.2023 15:09:00", dateTimeFormatter), 10,epic1.getId ()));
 
-        taskManager.createEpic (new Epic (0, "Второй Epic", "Описание второго эпика"));
+        taskManager.createEpic (new Epic (0, "Второй Epic", "Описание второго эпика", null, 10));
     }
 
 }

@@ -67,7 +67,7 @@ public class Main {
     }
 
     private void createDemoEpics() {
-        Epic epic1 = taskManager.createEpic (new Epic (0, "Первый Epic", "Описание первого эпика"));
+        Epic epic1 = taskManager.createEpic (new Epic (0, "Первый Epic", "Описание первого эпика", null, 10));
         taskManager.createSubtask (new Subtask (0, "Первая подзадача", "Описание первой подзадачи", LocalDateTime.parse("14.06.2023 09:15:00", dateTimeFormatter),  5, epic1.getId ()));
 
 //        taskManager.createSubtask (new Subtask (0, "Первая подзадача - попытка пересечения времени", "Описание первой подзадачи22", LocalDateTime.parse("14.06.2023 09:16:00", dateTimeFormatter),  5, epic1.getId ()));
@@ -75,7 +75,7 @@ public class Main {
         taskManager.createSubtask (new Subtask (0, "Вторая подзадача", "Описание второй подзадачи", LocalDateTime.parse("15.06.2023 18:23:00", dateTimeFormatter), 15, epic1.getId ()));
         taskManager.createSubtask (new Subtask (0, "Третья подзадача", "Описание третьей подзадачи", LocalDateTime.parse("29.06.2023 15:10:00", dateTimeFormatter), 8, epic1.getId ()));
 
-        taskManager.createEpic (new Epic (0, "Второй Epic", "Описание второго эпика"));
+        taskManager.createEpic (new Epic (0, "Второй Epic", "Описание второго эпика", null, 20));
     }
 
     private void createDemoTasks() {

@@ -18,14 +18,16 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public final class FileBackedTasksManager extends InMemoryTaskManager {
 
     private final String filePath;
     private final static String DELIMITER = ",";
-    private final static List<String> HEADERS = List.of("id", "type", "name", "status", "description", "startTime", "duration", "endTime", "epic");
+    private final static List<String> HEADERS = List.of("id", "type", "name", "status", "description", "startTime", "duration", "epic");
 
     public FileBackedTasksManager(String filePath) {
         this.filePath = filePath;
@@ -221,7 +223,7 @@ public final class FileBackedTasksManager extends InMemoryTaskManager {
                 task.getDescription(),
                 startTime == null ? " " : startTime.format(dateTimeFormatter),
                 String.valueOf(task.getDuration()),
-                endTime == null ? " " : endTime.format(dateTimeFormatter),
+//                endTime == null ? " " : endTime.format(dateTimeFormatter),
                 task instanceof Subtask ? String.valueOf(((Subtask) task).getEpicId()) : ""
         );
     }
@@ -240,13 +242,13 @@ public final class FileBackedTasksManager extends InMemoryTaskManager {
             LocalDateTime startTime = strStartTime.isEmpty() ? null : LocalDateTime.parse(strStartTime, dateTimeFormatter);
             int duration = Integer.parseInt(fields[6]);
 
-            int epicId = fields.length == HEADERS.size() ? Integer.parseInt(fields[8]) : 0;
+            int epicId = fields.length == HEADERS.size() ? Integer.parseInt(fields[7]) : 0;
 
             switch (itemType) {
                 case TASK:
                     return new Task(id, name, description, startTime, duration, itemStatus);
                 case EPIC:
-                    return new Epic(id, name, description, itemStatus);
+                    return new Epic(id, name, description, startTime, duration, itemStatus);
                 case SUBTASK:
                     return new Subtask(id, name, description, startTime, duration, itemStatus, epicId);
             }

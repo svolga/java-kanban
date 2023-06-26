@@ -12,12 +12,12 @@ public class Epic extends Task {
 
     private final List<Integer> subtaskIds = new ArrayList<>();
 
-    public Epic(int id, String title, String description) {
-        super(id, title, description, null, 0);
+    public Epic(int id, String title, String description, LocalDateTime startTime, int duration) {
+        super(id, title, description, startTime, duration);
     }
 
-    public Epic(int id, String title, String description, ItemStatus itemStatus) {
-        super(id, title, description, null, 0, itemStatus);
+    public Epic(int id, String title, String description, LocalDateTime startTime, int duration, ItemStatus itemStatus) {
+        super(id, title, description, startTime, duration, itemStatus);
     }
 
     public List<Integer> getSubtaskIds() {

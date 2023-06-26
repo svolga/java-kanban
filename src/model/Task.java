@@ -6,10 +6,7 @@ import util.Const;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 public class Task {
 
@@ -17,7 +14,7 @@ public class Task {
     private String title;
     private String description;
     private ItemStatus status;
-    private int duration;
+    private long duration;
     private LocalDateTime startTime;
     protected LocalDateTime endTime;
     protected final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(Const.DATE_TIME_FORMAT);
@@ -72,11 +69,11 @@ public class Task {
         this.status = status;
     }
 
-    public int getDuration() {
+    public long getDuration() {
         return duration;
     }
 
-    public void setDuration(int duration) {
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 

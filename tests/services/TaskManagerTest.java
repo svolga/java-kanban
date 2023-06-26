@@ -91,7 +91,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void clearSubtasks() {
-        Epic epic = taskManager.createEpic(new Epic(0, "Первый Epic", "Описание первого эпика"));
+        Epic epic = taskManager.createEpic(new Epic(0, "Первый Epic", "Описание первого эпика", null, 10));
         assertNotNull(epic, "Epic не существует");
 
         Subtask subTask = taskManager.createSubtask(new Subtask(0, "Первый Subtask", "Описание первого Subtask", LocalDateTime.parse("20.06.2023 13:09:00", dateTimeFormatter), 10, epic.getId()));
@@ -107,7 +107,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void createEpic() {
-        Epic epic = taskManager.createEpic(new Epic(0, "Первый Epic", "Описание первого эпика"));
+        Epic epic = taskManager.createEpic(new Epic(0, "Первый Epic", "Описание первого эпика", null, 10));
 
         assertEquals(1, epic.getId(), "Неверный Id для Epic");
         assertEquals(0, epic.getSubtaskIds().size(), "Неверное количество подзадач");
@@ -146,7 +146,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void updateEpic() {
-        Epic epic = new Epic(0, "Test createEpic", "Test createEpic description", NEW);
+        Epic epic = new Epic(0, "Test createEpic", "Test createEpic description", null, 10, NEW);
         final Epic savedEpic = taskManager.createEpic(epic);
         savedEpic.setTitle("demo title");
         savedEpic.setStatus(IN_PROGRESS);
@@ -176,7 +176,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void clearEpics() {
-        Epic epic = taskManager.createEpic(new Epic(0, "Первый Epic", "Описание первого эпика"));
+        Epic epic = taskManager.createEpic(new Epic(0, "Первый Epic", "Описание первого эпика", null, 10));
 
         int createdEpicId = epic.getId();
         int count = 3;
@@ -192,7 +192,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void removeEpic() {
-        Epic epic = taskManager.createEpic(new Epic(0, "Первый Epic", "Описание первого эпика"));
+        Epic epic = taskManager.createEpic(new Epic(0, "Первый Epic", "Описание первого эпика", null, 10));
 
         int createdEpicId = epic.getId();
         int count = 3;
@@ -208,7 +208,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void createSubtask() {
-        Epic epic = taskManager.createEpic(new Epic(0, "Первый Epic", "Описание первого эпика"));
+        Epic epic = taskManager.createEpic(new Epic(0, "Первый Epic", "Описание первого эпика", null, 10));
 
         Subtask subTask = new Subtask(0, "Test createTask", "Test createTask description", LocalDateTime.parse("20.06.2023 13:09:00", dateTimeFormatter), 10, NEW, epic.getId());
         final Subtask savedSubTask = taskManager.createSubtask(subTask);
@@ -226,7 +226,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void updateSubtask() {
-        Epic epic = new Epic(0, "Test createEpic", "Test createEpic description", NEW);
+        Epic epic = new Epic(0, "Test createEpic", "Test createEpic description", null, 10, NEW);
         final Epic savedEpic = taskManager.createEpic(epic);
 
         Subtask subTask = new Subtask(0, "Test createTask", "Test createTask description", LocalDateTime.parse("20.06.2023 13:09:00", dateTimeFormatter), 10, NEW, savedEpic.getId());
@@ -242,7 +242,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void getAllSubtasks() {
-        final Epic epic = taskManager.createEpic(new Epic(0, "Test createEpic", "Test createEpic description", NEW));
+        final Epic epic = taskManager.createEpic(new Epic(0, "Test createEpic", "Test createEpic description", null, 10, NEW));
 
         int count = 3;
         createDemoTasks(count, ItemType.SUBTASK, epic);
@@ -264,7 +264,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void getSubtask() {
-        final Epic epic = taskManager.createEpic(new Epic(0, "Test createEpic", "Test createEpic description", NEW));
+        final Epic epic = taskManager.createEpic(new Epic(0, "Test createEpic", "Test createEpic description", null, 10, NEW));
         createDemoTasks(3, ItemType.SUBTASK, epic);
         List<Subtask> subTasks = taskManager.getAllSubtasks();
 
@@ -276,7 +276,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
     @Test
     void removeSubtask() {
         final int count = 5;
-        final Epic epic = taskManager.createEpic(new Epic(0, "Test createEpic", "Test createEpic description", NEW));
+        final Epic epic = taskManager.createEpic(new Epic(0, "Test createEpic", "Test createEpic description", null, 10, NEW));
         createDemoTasks(count, ItemType.SUBTASK, epic);
         assertEquals(count, taskManager.getAllSubtasks().size());
 
@@ -324,7 +324,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
                     taskManager.createTask(task);
                     break;
                 case EPIC:
-                    Epic epic = new Epic(i, title, description, NEW);
+                    Epic epic = new Epic(i, title, description, null, 10, NEW);
                     taskManager.createEpic(epic);
                     break;
                 case SUBTASK:
