@@ -29,5 +29,5 @@ public interface TaskManager {
     Subtask getSubtask(int id);
     void removeSubtask(int id);
     List<Task> getHistory();
-    Set<Task> getPrioritizedTasks();
+    List<Task> getPrioritizedTasks();
 }

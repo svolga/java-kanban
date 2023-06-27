@@ -2,13 +2,13 @@ package services;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
-import java.util.ArrayList;
 import java.util.TreeSet;
 import java.util.Comparator;
+import java.util.ArrayList;
 
 import exception.IntersectionDateIntervalException;
 import model.Epic;
@@ -28,24 +28,28 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Task> tasks = new HashMap<>();
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
     protected final Set<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime,
-        Comparator.nullsLast(Comparator.naturalOrder())
-        ));
+            Comparator.nullsLast(Comparator.naturalOrder())
+    ));
 
     protected final static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(Const.DATE_TIME_FORMAT);
     private final IntersectionDateIntervalValidator<Task> intersectionDateIntervalValidator = new IntersectionDateIntervalValidator<>();
 
     @Override
     public Task createTask(Task task) throws IntersectionDateIntervalException {
-        intersectionDateIntervalValidator.validate(getPrioritizedTasks(), task);
+        intersectionDateIntervalValidator.validate(prioritizedTasks, task);
         task.setId(getNextId());
         tasks.put(task.getId(), task);
+        prioritizedTasks.add(task);
         return task;
     }
 
     @Override
     public void updateTask(Task task) throws IntersectionDateIntervalException {
         if (tasks.containsKey(task.getId())) {
-            intersectionDateIntervalValidator.validate(getPrioritizedTasks(), task);
+            intersectionDateIntervalValidator.validate(prioritizedTasks, task);
+            prioritizedTasks.remove(tasks.get(task.getId()));
+            removeTask(task.getId());
+            prioritizedTasks.add(task);
             tasks.put(task.getId(), task);
         }
     }
@@ -64,19 +68,26 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearTasks() {
-        tasks.keySet().forEach(historyManager::remove);
+        tasks.keySet().forEach(id -> {
+            historyManager.remove(id);
+            prioritizedTasks.remove(tasks.get(id));
+        });
         tasks.clear();
     }
 
     @Override
     public void removeTask(int id) {
-        tasks.remove(id);
+        Task task = tasks.remove(id);
         historyManager.remove(id);
+        prioritizedTasks.remove(task);
     }
 
     @Override
     public void clearSubtasks() {
-        subtasks.keySet().forEach(historyManager::remove);
+        subtasks.keySet().forEach(id -> {
+            historyManager.remove(id);
+            prioritizedTasks.remove(subtasks.get(id));
+        });
         subtasks.clear();
 
         for (Epic epic : epics.values()) {
@@ -137,11 +148,11 @@ public class InMemoryTaskManager implements TaskManager {
     public Subtask createSubtask(Subtask subtask) throws IntersectionDateIntervalException {
         Epic epic = epics.get(subtask.getEpicId());
         if (null != epic) {
-            intersectionDateIntervalValidator.validate(getPrioritizedTasks(), subtask);
+            intersectionDateIntervalValidator.validate(prioritizedTasks, subtask);
             subtask.setId(getNextId());
             subtasks.put(subtask.getId(), subtask);
-
             epic.addSubtask(subtask.getId());
+            prioritizedTasks.add(subtask);
             updateEpicInternal(subtask.getEpicId());
         }
         return subtask;
@@ -150,8 +161,15 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubtask(Subtask subtask) throws IntersectionDateIntervalException {
         if (subtasks.containsKey(subtask.getId())) {
-            intersectionDateIntervalValidator.validate(getPrioritizedTasks(), subtask);
+            intersectionDateIntervalValidator.validate(prioritizedTasks, subtask);
+            prioritizedTasks.remove(subtasks.get(subtask.getId()));
+            removeSubtask(subtask.getId());
+            prioritizedTasks.add(subtask);
             subtasks.put(subtask.getId(), subtask);
+            Epic epic = epics.get(subtask.getEpicId());
+            if (null != epic) {
+                epic.addSubtask(subtask.getId());
+            }
             updateEpicInternal(subtask.getEpicId());
         }
     }
@@ -190,6 +208,7 @@ public class InMemoryTaskManager implements TaskManager {
                 epic.removeSubtask(subtask.getId());
                 updateEpicInternal(epic.getId());
             }
+            prioritizedTasks.remove(subtask);
             historyManager.remove(id);
         }
     }
@@ -200,11 +219,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Set<Task> getPrioritizedTasks() {
-        prioritizedTasks.clear();
-        prioritizedTasks.addAll(getAllTasks());
-        prioritizedTasks.addAll(getAllSubtasks());
-        return prioritizedTasks;
+    public List<Task> getPrioritizedTasks() {
+        return List.copyOf(prioritizedTasks);
     }
 
     private int getNextId() {
@@ -229,18 +245,16 @@ public class InMemoryTaskManager implements TaskManager {
 
                 if (minStartTime == null) {
                     minStartTime = subtask.getStartTime();
-                }
-                else {
-                    if (subtask.getStartTime() != null && subtask.getStartTime().isBefore(minStartTime)){
+                } else {
+                    if (subtask.getStartTime() != null && subtask.getStartTime().isBefore(minStartTime)) {
                         minStartTime = subtask.getStartTime();
                     }
                 }
 
                 if (maxEndTime == null) {
                     maxEndTime = subtask.getEndTime();
-                }
-                else {
-                    if (subtask.getEndTime() != null && subtask.getEndTime().isAfter(maxEndTime)){
+                } else {
+                    if (subtask.getEndTime() != null && subtask.getEndTime().isAfter(maxEndTime)) {
                         maxEndTime = subtask.getEndTime();
                     }
                 }
