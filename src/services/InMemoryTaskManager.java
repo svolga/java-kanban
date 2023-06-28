@@ -48,7 +48,6 @@ public class InMemoryTaskManager implements TaskManager {
         if (tasks.containsKey(task.getId())) {
             intersectionDateIntervalValidator.validate(prioritizedTasks, task);
             prioritizedTasks.remove(tasks.get(task.getId()));
-            removeTask(task.getId());
             prioritizedTasks.add(task);
             tasks.put(task.getId(), task);
         }
@@ -128,7 +127,12 @@ public class InMemoryTaskManager implements TaskManager {
     public void clearEpics() {
         epics.keySet().forEach(historyManager::remove);
         epics.clear();
-        subtasks.keySet().forEach(historyManager::remove);
+
+        subtasks.keySet().forEach(id -> {
+            historyManager.remove(id);
+            prioritizedTasks.remove(subtasks.get(id));
+        });
+
         subtasks.clear();
     }
 
@@ -137,6 +141,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.remove(epicId);
         if (epic != null) {
             for (int id : epic.getSubtaskIds()) {
+                prioritizedTasks.remove(subtasks.get(id));
                 subtasks.remove(id);
                 historyManager.remove(id);
             }
@@ -163,7 +168,6 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtasks.containsKey(subtask.getId())) {
             intersectionDateIntervalValidator.validate(prioritizedTasks, subtask);
             prioritizedTasks.remove(subtasks.get(subtask.getId()));
-            removeSubtask(subtask.getId());
             prioritizedTasks.add(subtask);
             subtasks.put(subtask.getId(), subtask);
             Epic epic = epics.get(subtask.getEpicId());
