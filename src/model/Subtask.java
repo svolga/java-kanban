@@ -2,26 +2,22 @@ package model;
 
 import model.enums.ItemStatus;
 import model.enums.ItemType;
-
-import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Subtask extends Task {
 
-    private int epicId;
+   final private int epicId;
 
-    public Subtask(int id, String title, String description, LocalDateTime startTime, int duration, int epicId) {
+    public Subtask(int id, String title, String description, String startTime, int duration, int epicId) {
         super(id, title, description, startTime, duration);
         this.epicId = epicId;
+        this.itemType = ItemType.SUBTASK;
     }
 
-    public Subtask(int id, String title, String description, LocalDateTime startTime, int duration, ItemStatus status, int epicId) {
+    public Subtask(int id, String title, String description, String startTime, int duration, ItemStatus status, int epicId) {
         super(id, title, description, startTime, duration, status);
         this.epicId = epicId;
-    }
-
-    public void setEpicId(int epicId) {
-        this.epicId = epicId;
+        this.itemType = ItemType.SUBTASK;
     }
 
     public int getEpicId() {
@@ -48,10 +44,5 @@ public class Subtask extends Task {
                 super.toString() +
                 ", epicId=" + epicId +
                 '}';
-    }
-    
-    @Override
-    public ItemType getType() {
-        return ItemType.SUBTASK;
     }
 }

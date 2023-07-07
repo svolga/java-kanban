@@ -21,17 +21,15 @@ public class IntersectionDateIntervalValidator<T extends Task> {
                         continue;
 
                     LocalDateTime startTime = task.getStartTime();
-
                     if (startTime != null) {
-
                         LocalDateTime endTime = task.getEndTime();
                         if (((startTime.isBefore(checkedEndTime) || startTime.isEqual(checkedEndTime)) && endTime.isAfter(checkedEndTime)) ||
                                 (startTime.isAfter(checkedStartTime) && (endTime.isBefore(checkedEndTime) || endTime.isEqual(checkedEndTime))) ||
-                                ((startTime.isBefore(checkedStartTime) || startTime.isEqual(checkedStartTime)) && (endTime.isAfter(checkedStartTime)))
-                        ) {
-                            throw new IntersectionDateIntervalException(String.format("Ошибка: Пересечение интервалов в задаче: %s c %s", checkedTask, task ));
+                                ((startTime.isBefore(checkedStartTime) || startTime.isEqual(checkedStartTime)) && (endTime.isAfter(checkedStartTime)))) {
+                            throw new IntersectionDateIntervalException(String.format("Ошибка: Пересечение интервалов в задаче: %s c %s", checkedTask, task));
                         }
                     }
+
                 }
             }
         }

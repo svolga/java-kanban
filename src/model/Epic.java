@@ -12,12 +12,14 @@ public class Epic extends Task {
 
     private final List<Integer> subtaskIds = new ArrayList<>();
 
-    public Epic(int id, String title, String description, LocalDateTime startTime, int duration) {
+    public Epic(int id, String title, String description, String startTime, int duration) {
         super(id, title, description, startTime, duration);
+        this.itemType = ItemType.EPIC;
     }
 
-    public Epic(int id, String title, String description, LocalDateTime startTime, int duration, ItemStatus itemStatus) {
+    public Epic(int id, String title, String description, String startTime, int duration, ItemStatus itemStatus) {
         super(id, title, description, startTime, duration, itemStatus);
+        this.itemType = ItemType.EPIC;
     }
 
     public List<Integer> getSubtaskIds() {
@@ -57,12 +59,6 @@ public class Epic extends Task {
                 ", subtasks=" + subtaskIds +
                 '}';
     }
-
-    @Override
-    public ItemType getType() {
-        return ItemType.EPIC;
-    }
-
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;

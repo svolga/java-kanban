@@ -23,14 +23,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class FileBackedTasksManager extends InMemoryTaskManager {
+public class FileBackedTasksManager extends InMemoryTaskManager {
 
-    private final String filePath;
+    protected final String path;
     private final static String DELIMITER = ",";
     private final static List<String> HEADERS = List.of("id", "type", "name", "status", "description", "startTime", "duration", "epic");
 
-    public FileBackedTasksManager(String filePath) {
-        this.filePath = filePath;
+    public FileBackedTasksManager(String path) {
+        this.path = path;
     }
 
     @Override
@@ -129,7 +129,7 @@ public final class FileBackedTasksManager extends InMemoryTaskManager {
         save();
     }
 
-    public static FileBackedTasksManager loadFromFile(File file) throws IOException {
+    public static FileBackedTasksManager load(File file) throws IOException {
         if (!file.exists()) {
             throw new FileNotFoundException("Файл не существует: " + file.getAbsolutePath());
         }
@@ -211,19 +211,16 @@ public final class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     private String toString(final Task task) {
-
         LocalDateTime startTime = task.getStartTime();
-        LocalDateTime endTime = task.getEndTime();
 
         return String.join(DELIMITER,
                 String.valueOf(task.getId()),
-                String.valueOf(task.getType()),
+                String.valueOf(task.getItemType()),
                 task.getTitle(),
                 String.valueOf(task.getStatus()),
                 task.getDescription(),
                 startTime == null ? " " : startTime.format(dateTimeFormatter),
                 String.valueOf(task.getDuration()),
-//                endTime == null ? " " : endTime.format(dateTimeFormatter),
                 task instanceof Subtask ? String.valueOf(((Subtask) task).getEpicId()) : ""
         );
     }
@@ -238,8 +235,7 @@ public final class FileBackedTasksManager extends InMemoryTaskManager {
             String name = fields[2];
             ItemStatus itemStatus = ItemStatus.valueOf(fields[3]);
             String description = fields[4];
-            String strStartTime = fields[5].trim();
-            LocalDateTime startTime = strStartTime.isEmpty() ? null : LocalDateTime.parse(strStartTime, dateTimeFormatter);
+            String startTime = fields[5].trim();
             int duration = Integer.parseInt(fields[6]);
 
             int epicId = fields.length == HEADERS.size() ? Integer.parseInt(fields[7]) : 0;
@@ -256,13 +252,13 @@ public final class FileBackedTasksManager extends InMemoryTaskManager {
         return null;
     }
 
-    private void save() throws ManagerSaveException {
+    protected void save() throws ManagerSaveException {
         List<Task> list = new ArrayList<>();
         list.addAll(getAllTasks());
         list.addAll(getAllEpics());
         list.addAll(getAllSubtasks());
 
-        try (BufferedWriter br = new BufferedWriter(new FileWriter(filePath))) {
+        try (BufferedWriter br = new BufferedWriter(new FileWriter(path))) {
             br.write(String.join(DELIMITER, HEADERS));
             br.newLine();
             for (Task task : list) {

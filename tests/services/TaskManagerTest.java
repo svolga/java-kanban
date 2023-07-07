@@ -1,30 +1,30 @@
 package services;
 
+import org.junit.jupiter.api.Test;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import exception.IntersectionDateIntervalException;
 import model.Epic;
 import model.Subtask;
 import model.Task;
 import model.enums.ItemType;
-import org.junit.jupiter.api.Test;
-import util.Const;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
 import static model.enums.ItemStatus.IN_PROGRESS;
 import static model.enums.ItemStatus.NEW;
 import static model.enums.ItemStatus.DONE;
-import static org.junit.jupiter.api.Assertions.*;
+
 
 abstract public class TaskManagerTest<T extends TaskManager> {
 
     T taskManager;
-    protected final static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(Const.DATE_TIME_FORMAT);
 
     @Test
     void createTask() {
-        Task task = new Task(0, "Test createTask", "Test createTask description", LocalDateTime.parse("20.06.2023 13:09:00", dateTimeFormatter), 10, NEW);
+        Task task = new Task(0, "Test createTask", "Test createTask description", "20.06.2023 13:09:00", 10, NEW);
         final Task savedTask = taskManager.createTask(task);
 
         assertEquals(1, savedTask.getId(), "Неверный Id для Task");
@@ -40,7 +40,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void updateTask() {
-        Task task = new Task(1, "Test createTask", "Test createTask description", LocalDateTime.parse("20.06.2023 11:15:00", dateTimeFormatter), 10, NEW);
+        Task task = new Task(1, "Test createTask", "Test createTask description", "20.06.2023 11:15:00", 10, NEW);
         final Task savedTask = taskManager.createTask(task);
         savedTask.setTitle("demo title");
         savedTask.setStatus(IN_PROGRESS);
@@ -53,7 +53,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void getTask() {
-        Task task = new Task(1, "Test createTask", "Test createTask description", LocalDateTime.parse("20.06.2023 13:09:00", dateTimeFormatter), 10, NEW);
+        Task task = new Task(1, "Test createTask", "Test createTask description", "20.06.2023 13:09:00", 10, NEW);
         final Task savedTask = taskManager.createTask(task);
         assertEquals(savedTask, taskManager.getAllTasks().get(0), "Задачи не совпадают.");
     }
@@ -94,7 +94,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
         Epic epic = taskManager.createEpic(new Epic(0, "Первый Epic", "Описание первого эпика", null, 10));
         assertNotNull(epic, "Epic не существует");
 
-        Subtask subTask = taskManager.createSubtask(new Subtask(0, "Первый Subtask", "Описание первого Subtask", LocalDateTime.parse("20.06.2023 13:09:00", dateTimeFormatter), 10, epic.getId()));
+        Subtask subTask = taskManager.createSubtask(new Subtask(0, "Первый Subtask", "Описание первого Subtask", "20.06.2023 13:09:00", 10, epic.getId()));
         assertNotNull(subTask, "SubTask не существует");
         assertEquals(subTask.getEpicId(), epic.getId(), "Неверно назначается Epic");
         assertEquals(1, epic.getSubtaskIds().size(), "Неверное количество Subtasks внутри Epic");
@@ -107,7 +107,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void createEpic() {
-        Epic epic = taskManager.createEpic(new Epic(0, "Первый Epic", "Описание первого эпика", null, 10));
+        Epic epic = taskManager.createEpic(new Epic(0,  "Первый Epic", "Описание первого эпика", null, 10));
 
         assertEquals(1, epic.getId(), "Неверный Id для Epic");
         assertEquals(0, epic.getSubtaskIds().size(), "Неверное количество подзадач");
@@ -210,7 +210,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
     void createSubtask() {
         Epic epic = taskManager.createEpic(new Epic(0, "Первый Epic", "Описание первого эпика", null, 10));
 
-        Subtask subTask = new Subtask(0, "Test createTask", "Test createTask description", LocalDateTime.parse("20.06.2023 13:09:00", dateTimeFormatter), 10, NEW, epic.getId());
+        Subtask subTask = new Subtask(0, "Test createTask", "Test createTask description", "20.06.2023 13:09:00", 10, NEW, epic.getId());
         final Subtask savedSubTask = taskManager.createSubtask(subTask);
 
         assertEquals(2, savedSubTask.getId(), "Неверный Id для SubTask");
@@ -226,10 +226,10 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
     @Test
     void updateSubtask() {
-        Epic epic = new Epic(0, "Test createEpic", "Test createEpic description", null, 10, NEW);
+        Epic epic = new Epic(0,  "Test createEpic", "Test createEpic description", null, 10, NEW);
         final Epic savedEpic = taskManager.createEpic(epic);
 
-        Subtask subTask = new Subtask(0, "Test createTask", "Test createTask description", LocalDateTime.parse("20.06.2023 13:09:00", dateTimeFormatter), 10, NEW, savedEpic.getId());
+        Subtask subTask = new Subtask(0, "Test createTask", "Test createTask description", "20.06.2023 13:09:00", 10, NEW, savedEpic.getId());
         final Subtask savedSubTask = taskManager.createSubtask(subTask);
         savedSubTask.setTitle("demo title");
         savedSubTask.setStatus(IN_PROGRESS);
@@ -320,7 +320,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
             switch (itemType) {
                 case TASK:
-                    Task task = new Task(i, title, description, LocalDateTime.parse(String.format("%02d.06.2023 10:00:00", i + 1), dateTimeFormatter), 10, NEW);
+                    Task task = new Task(i, title, description, String.format("%02d.06.2023 10:00:00", i + 1), 10, NEW);
                     taskManager.createTask(task);
                     break;
                 case EPIC:
@@ -328,7 +328,7 @@ abstract public class TaskManagerTest<T extends TaskManager> {
                     taskManager.createEpic(epic);
                     break;
                 case SUBTASK:
-                    Subtask subtask = new Subtask(i, title, description, LocalDateTime.parse(String.format("%02d.06.2023 12:00:00", i + 1), dateTimeFormatter), 10, NEW, linkedEpic == null ? 0 : linkedEpic.getId());
+                    Subtask subtask = new Subtask(i, title, description, String.format("%02d.06.2023 12:00:00", i + 1), 10, NEW, linkedEpic == null ? 0 : linkedEpic.getId());
                     taskManager.createSubtask(subtask);
                     break;
 
@@ -341,12 +341,12 @@ abstract public class TaskManagerTest<T extends TaskManager> {
         IntersectionDateIntervalException ex = assertThrows(
                 IntersectionDateIntervalException.class,
                 () -> {
-                    taskManager.createTask(new Task(0, "Первая задача", "Описание первой задачи", LocalDateTime.parse("25.06.2023 12:05:00", dateTimeFormatter), 10));
-                    taskManager.createTask(new Task(0, "Вторая задача с пересечением времени", "Описание второй задачи", LocalDateTime.parse("25.06.2023 12:04:00", dateTimeFormatter), 10));
+                    taskManager.createTask(new Task(0, "Первая задача", "Описание первой задачи", "25.06.2023 12:05:00", 10));
+                    taskManager.createTask(new Task(0, "Вторая задача с пересечением времени", "Описание второй задачи", "25.06.2023 12:04:00", 10));
                 }
         );
 
-        assertEquals("Ошибка: Пересечение интервалов в задаче: Task {id = 0, title = Вторая задача с пересечением времени, description = Описание второй задачи, status = NEW; startTime = 25.06.2023 12:04:00; duration = 10; endTime = 25.06.2023 12:14:00} c Task {id = 1, title = Первая задача, description = Описание первой задачи, status = NEW; startTime = 25.06.2023 12:05:00; duration = 10; endTime = 25.06.2023 12:15:00}", ex.getMessage());
+        assertEquals("Ошибка: Пересечение интервалов в задаче: Task {id = 0, itemType = TASK, title = Вторая задача с пересечением времени, description = Описание второй задачи, status = NEW; startTime = 25.06.2023 12:04:00; duration = 10; endTime = 25.06.2023 12:14:00} c Task {id = 1, itemType = TASK, title = Первая задача, description = Описание первой задачи, status = NEW; startTime = 25.06.2023 12:05:00; duration = 10; endTime = 25.06.2023 12:15:00}", ex.getMessage());
     }
 
 }

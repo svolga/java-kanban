@@ -1,6 +1,7 @@
 package services;
 
 import model.Task;
+import model.enums.ItemType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import util.Const;
@@ -27,7 +28,7 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     void add() {
-        Task task = new Task(0, "Test createTask", "Test createTask description", LocalDateTime.parse("22.06.2023 13:09:10", dateTimeFormatter), 8, NEW);
+        Task task = new Task(0, "Test createTask", "Test createTask description", "22.06.2023 13:09:10", 8, NEW);
         historyManager.add(task);
         final List<Task> history = historyManager.getHistory();
         assertNotNull(history, "История не пустая.");
@@ -36,7 +37,7 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     void addShouldNotReturnDoubles() {
-        Task task = new Task(0, "Test createTask", "Test createTask description", LocalDateTime.parse("20.06.2023 13:09:00", dateTimeFormatter), 10, NEW);
+        Task task = new Task(0, "Test createTask", "Test createTask description", "20.06.2023 13:09:00", 10, NEW);
         for (int i = 0; i < 3; i++) {
             historyManager.add(task);
         }
@@ -49,7 +50,7 @@ public class InMemoryHistoryManagerTest {
         List<Task> tasks = new ArrayList<>();
         final int count = 4;
         for (int i = 0; i < count; i++) {
-            Task task = new Task(i, "Test createTask" + i, "Test createTask description" + i, LocalDateTime.parse("21.06.2023 13:12:00", dateTimeFormatter), 10, NEW);
+            Task task = new Task(i, "Test createTask" + i, "Test createTask description" + i, "21.06.2023 13:12:00",  10, NEW);
             tasks.add(task);
             historyManager.add(task);
         }
