@@ -6,7 +6,6 @@ import model.Subtask;
 import model.Task;
 
 import java.util.List;
-import java.util.Set;
 
 public interface TaskManager {
     Task createTask(Task task) throws IntersectionDateIntervalException;
@@ -14,20 +13,20 @@ public interface TaskManager {
     Task getTask(int id);
     List<Task> getAllTasks();
     void clearTasks();
-    void removeTask(int id);
+    Task removeTask(int id);
     void clearSubtasks();
     Epic createEpic(Epic epic);
     void updateEpic(Epic epic);
     Epic getEpic(int id);
     List<Epic> getAllEpics();
     void clearEpics();
-    void removeEpic(int epicId);
+    Epic removeEpic(int epicId);
     Subtask createSubtask(Subtask subtask) throws IntersectionDateIntervalException;
     void updateSubtask(Subtask subtask) throws IntersectionDateIntervalException;
     List<Subtask> getAllSubtasks();
     List<Subtask> getAllSubtasksByEpicId(int epicId);
     Subtask getSubtask(int id);
-    void removeSubtask(int id);
+    Subtask removeSubtask(int id);
     List<Task> getHistory();
     List<Task> getPrioritizedTasks();
 }

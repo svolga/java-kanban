@@ -58,17 +58,17 @@ public class HttpTaskServerTest {
     }
 
     @BeforeAll
-    private static void BeforeAll() {
+    private static void beforeAll() {
         kvServer.start();
     }
 
     @AfterAll
-    private static void AfterAll() {
+    private static void afterAll() {
         kvServer.stop();
     }
 
     @BeforeEach
-    private void BeforeEach() {
+    private void beforeEach() {
         try {
             httpTaskServer = new HttpTaskServer();
         } catch (IOException exception) {
@@ -78,7 +78,7 @@ public class HttpTaskServerTest {
     }
 
     @AfterEach
-    private void AfterEach() {
+    private void afterEach() {
         httpTaskServer.stop();
     }
 

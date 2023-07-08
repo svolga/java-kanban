@@ -29,6 +29,7 @@ public class HttpTaskManager extends FileBackedTasksManager {
         System.out.println("Конструктор HttpTaskManager");
         kvTaskClient = new KVTaskClient(url);
         System.out.println("Создан клиент в конструкторе HttpTaskManager");
+        load();
     }
 
     @Override
@@ -51,7 +52,7 @@ public class HttpTaskManager extends FileBackedTasksManager {
     }
 
 
-    public void load() {
+    private void load() {
         loadTasks();
         loadHistory();
         loadPriority();
@@ -95,6 +96,15 @@ public class HttpTaskManager extends FileBackedTasksManager {
                         Epic epicNew = gson.fromJson(jsonObjectTask, Epic.class);
                         epics.put(epicNew.getId(), epicNew);
                 }
+
+                JsonElement jsonId = jsonObjectTask.get("id");
+                if (jsonId.isJsonNull()){
+                    int getId = jsonObjectTask.get("id").getAsInt();
+                    if (getId > nextId) {
+                        nextId = getId;
+                    }
+                }
+
             }
         }
     }

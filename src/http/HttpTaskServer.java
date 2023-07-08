@@ -8,7 +8,7 @@ import exception.IntersectionDateIntervalException;
 import model.Epic;
 import model.Subtask;
 import model.Task;
-import services.HttpTaskManager;
+import services.TaskManager;
 import util.Managers;
 import util.QueryParameter;
 
@@ -32,12 +32,11 @@ public class HttpTaskServer {
     private static final int PORT = 8080;
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
     private final HttpServer server;
-    private final HttpTaskManager taskManager;
+    private final TaskManager taskManager;
     private static Gson gson;
 
     public HttpTaskServer() throws IOException {
         taskManager = Managers.getDefaultHttp("http://localhost:8078");
-        taskManager.load();
 
         gson = Managers.getGson();
         server = HttpServer.create(new InetSocketAddress("localhost", PORT), 0);
@@ -113,40 +112,47 @@ public class HttpTaskServer {
         int id = getId(exchange);
         out.println("id = " + id);
         Task task = taskManager.getTask(id);
-        out.println("task = " + task);
-        String data = gson.toJson(task, Task.class);
-        out.println("data = " + data);
-        writeResponse(exchange, data, 200);
+        if (task == null) {
+            writeResponse(exchange, "Не найден Task c id = " + id, 404);
+        } else {
+            String data = gson.toJson(task, Task.class);
+            out.println("data = " + data);
+            writeResponse(exchange, data, 200);
+        }
     }
 
     private void handleGetSubtask(HttpExchange exchange) throws IOException {
         int id = getId(exchange);
         out.println("id = " + id);
         Subtask subtask = taskManager.getSubtask(id);
-        out.println("subtask = " + subtask);
-        String data = gson.toJson(subtask, Subtask.class);
-        out.println("data = " + data);
-        writeResponse(exchange, data, 200);
+        if (subtask == null) {
+            writeResponse(exchange, "Не найден Subtask c id = " + id, 404);
+        } else {
+            String data = gson.toJson(subtask, Subtask.class);
+            out.println("data = " + data);
+            writeResponse(exchange, data, 200);
+        }
     }
 
     private void handleGetEpic(HttpExchange exchange) throws IOException {
         int id = getId(exchange);
         out.println("id = " + id);
         Epic epic = taskManager.getEpic(id);
-        out.println("epic = " + epic);
-        String data = gson.toJson(epic, Epic.class);
-        out.println("data = " + data);
-        writeResponse(exchange, data, 200);
+        if (epic == null) {
+            writeResponse(exchange, "Не найден Epic c id = " + id, 404);
+        } else {
+            String data = gson.toJson(epic, Epic.class);
+            out.println("data = " + data);
+            writeResponse(exchange, data, 200);
+        }
     }
 
     private void handleRemoveTask(HttpExchange exchange) throws IOException {
         int id = getId(exchange);
         out.println("id = " + id);
-        if (taskManager.getTask(id) != null) {
-            taskManager.removeTask(id);
+        if (taskManager.removeTask(id) != null) {
             writeResponse(exchange, "Удален Task с id = " + id, 200);
-        }
-        else{
+        } else {
             writeResponse(exchange, "Не найден Task с id = " + id, 400);
         }
     }
@@ -154,11 +160,9 @@ public class HttpTaskServer {
     private void handleRemoveEpic(HttpExchange exchange) throws IOException {
         int id = getId(exchange);
         out.println("id = " + id);
-        if (taskManager.getEpic(id) != null) {
-            taskManager.removeEpic(id);
+        if (taskManager.removeEpic(id) != null) {
             writeResponse(exchange, "Удален Epic с id = " + id, 200);
-        }
-        else{
+        } else {
             writeResponse(exchange, "Не найден Epic с id = " + id, 400);
         }
     }
@@ -166,11 +170,9 @@ public class HttpTaskServer {
     private void handleRemoveSubtask(HttpExchange exchange) throws IOException {
         int id = getId(exchange);
         out.println("id = " + id);
-        if (taskManager.getSubtask(id) != null) {
-            taskManager.removeSubtask(id);
+        if (taskManager.removeSubtask(id) != null) {
             writeResponse(exchange, "Удален Subtask с id = " + id, 200);
-        }
-        else{
+        } else {
             writeResponse(exchange, "Не найден Subtask с id = " + id, 400);
         }
     }
@@ -204,8 +206,7 @@ public class HttpTaskServer {
                     taskManager.updateTask(task);
                     writeResponse(exchange, "Обновлен Task " + task, 200);
                 }
-            }
-            else{
+            } else {
                 throw new JsonSyntaxException("Не указан экземпляр Task");
             }
         } catch (JsonSyntaxException e) {
@@ -223,7 +224,7 @@ public class HttpTaskServer {
             body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
             Epic epic = gson.fromJson(body, Epic.class);
 
-            if (epic != null){
+            if (epic != null) {
                 if (taskManager.getEpic(epic.getId()) == null) {
                     Epic newEpic = taskManager.createEpic(epic);
                     String data = gson.toJson(newEpic, Epic.class);
@@ -232,8 +233,7 @@ public class HttpTaskServer {
                     taskManager.updateEpic(epic);
                     writeResponse(exchange, "Обновлен Epic " + epic, 200);
                 }
-            }
-            else{
+            } else {
                 throw new JsonSyntaxException("Не указан экземпляр Epic");
             }
         } catch (JsonSyntaxException e) {
@@ -251,7 +251,7 @@ public class HttpTaskServer {
             body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
             Subtask subtask = gson.fromJson(body, Subtask.class);
 
-            if (subtask != null){
+            if (subtask != null) {
                 if (taskManager.getSubtask(subtask.getId()) == null) {
                     Subtask newSubtask = taskManager.createSubtask(subtask);
                     String data = gson.toJson(newSubtask, Subtask.class);
@@ -260,8 +260,7 @@ public class HttpTaskServer {
                     taskManager.updateSubtask(subtask);
                     writeResponse(exchange, "Обновлен Subtask " + subtask, 200);
                 }
-            }
-            else{
+            } else {
                 throw new JsonSyntaxException("Не указан экземпляр Subtask");
             }
         } catch (JsonSyntaxException e) {
@@ -429,7 +428,7 @@ public class HttpTaskServer {
         GET_EPIC_SUBTASKS, GET_HISTORY, GET_PRIORITIZED_TASKS, UNKNOWN
     }
 
-    public HttpTaskManager getTaskManager(){
+    public TaskManager getTaskManager() {
         return taskManager;
     }
 

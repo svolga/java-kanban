@@ -34,7 +34,6 @@ public class Main {
 
     private void http() {
         createDemoHttp();
-        taskManager.load();
 
         printTasks();
         printEpics();

@@ -74,9 +74,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void removeTask(int id) {
-        super.removeTask(id);
+    public Task removeTask(int id) {
+        Task task = super.removeTask(id);
         save();
+        return task;
     }
 
     @Override
@@ -105,9 +106,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void removeEpic(int epicId) {
-        super.removeEpic(epicId);
+    public Epic removeEpic(int epicId) {
+        Epic epic = super.removeEpic(epicId);
         save();
+        return epic;
     }
 
     @Override
@@ -124,9 +126,10 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void removeSubtask(int id) {
-        super.removeSubtask(id);
+    public Subtask removeSubtask(int id) {
+        Subtask subtask = super.removeSubtask(id);
         save();
+        return subtask;
     }
 
     public static FileBackedTasksManager load(File file) throws IOException {
